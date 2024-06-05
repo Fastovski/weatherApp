@@ -57,8 +57,8 @@ const WeekContainer = () => {
   const formatDayCards = () => {
     return dailyData.map((reading, index) => {
       const tempInCelsius = reading.main.temp - 273.15;
-      const tempInFahrenheit = (tempInCelsius * 9/5) + 32;
-      return <DayCard reading={{...reading, main: {...reading.main, temp: tempInFahrenheit}}} key={index} />;
+      //const tempInFahrenheit = (tempInCelsius * 9/5) + 32;
+      return <DayCard reading={{...reading, main: {...reading.main, temp: tempInCelsius}}} key={index} />;
     });
   };
 
