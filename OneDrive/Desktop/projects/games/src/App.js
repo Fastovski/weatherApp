@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { useRef, useState, useEffect, useCallback } from 'react';
 
@@ -19,9 +18,10 @@ const errorAudio = new Audio("/error.mp3");
 
 function App() {
     const timer = useRef(null);
-    const grid = useRef(Array(ROWs).fill(Array(COLs).fill("")));
     const snakeCoordinates = useRef([]);
     const direction = useRef(RIGHT);
+    const [gridSize, setGridSize] = useState({ rows: ROWs, cols: COLs });
+    const grid = useRef(Array(gridSize.rows).fill(Array(gridSize.cols).fill("")));
     const snakeCoordinatesMap = useRef(new Set());
     const foodCoords = useRef({
         row: -1,
@@ -33,10 +33,10 @@ function App() {
 
     useEffect(() => {
         window.addEventListener("keydown", (e) => handleDirectionChange(e.key));
-    }, []);
+
+      }, []);
 
     useEffect(() => {
-        // Default snake length is 4 cell
         const snake_postions = [];
         for (let i = 0; i < DEFAULT_LENGTH; i++) {
             snake_postions.push({
@@ -52,6 +52,46 @@ function App() {
         syncSnakeCoordinatesMap();
         populateFoodBall();
     }, []);
+
+    // const updateGridSize = () => {
+    //     const cells = document.querySelectorAll('.cell');
+    //     const cellWidth = `${100 / gridSize.cols}%`;
+    //     const cellHeight = `${100 / gridSize.rows}%`;
+      
+    //     cells.forEach(cell => {
+    //       cell.style.width = cellWidth;
+    //       cell.style.height = cellHeight;
+    //     });
+    //   };
+
+    const handleGridSizeChange = (rows, cols) => {
+        setGridSize({ rows, cols });
+        // updateGridSize();
+        resetGame();
+    };
+
+    const resetGame = () => {
+        setPoints(0);
+        setGameOver(false);
+        direction.current = RIGHT;
+        snakeCoordinates.current = [];
+        snakeCoordinatesMap.current = new Set();
+        foodCoords.current = { row: -1, col: -1 };
+      
+        const snake_postions = [];
+        for (let i = 0; i < DEFAULT_LENGTH; i++) {
+          snake_postions.push({
+            row: 0,
+            col: i,
+            isHead: false,
+          });
+        }
+      
+        snake_postions[DEFAULT_LENGTH - 1].isHead = true;
+        snakeCoordinates.current = snake_postions;
+        syncSnakeCoordinatesMap();
+        populateFoodBall();
+    };
 
     const handleDirectionChange = (key) => {
         direction.current = getNewDirection(key);
@@ -89,25 +129,19 @@ function App() {
         const snakeHead = coords.pop();
         const curr_direction = direction.current;
 
-        // Check for food ball consumption
         const foodConsumed =
             snakeHead.row === foodCoords.current.row &&
             snakeHead.col === foodCoords.current.col;
 
-        // Update body coords based on direction and its position
         coords.forEach((_, idx) => {
-            // Replace last cell with snake head coords [last is the cell after snake head]
             if (idx === coords.length - 1) {
                 coords[idx] = { ...snakeHead };
                 coords[idx].isHead = false;
                 return;
             }
-
-            // Replace current cell coords with next cell coords
             coords[idx] = coords[idx + 1];
         });
 
-        // Update snake head coords based on direction
         switch (curr_direction) {
             case UP:
                 snakeHead.row -= 1;
@@ -125,21 +159,18 @@ function App() {
               return direction.current;
         }
 
-        // If food ball is consumed, update points and new position of food
         if (foodConsumed) {
             setPoints((points) => points + 10);
             populateFoodBall();
             bonusAudio.play();
         }
 
-        // If there is no collision for the movement, continue the game
         const collided = collisionCheck(snakeHead);
         if (collided) {
             stopGame();
             return;
         }
 
-        // Create new coords with new snake head
         coords.push(snakeHead);
         snakeCoordinates.current = foodConsumed
             ? [snakeTail, ...coords]
@@ -148,17 +179,15 @@ function App() {
     };
 
     const collisionCheck = (snakeHead) => {
-        // Check wall collision
         if (
-            snakeHead.col >= COLs ||
-            snakeHead.row >= ROWs ||
+            snakeHead.col >= gridSize.cols ||
+            snakeHead.row >= gridSize.rows ||
             snakeHead.col < 0 ||
             snakeHead.row < 0
         ) {
             return true;
         }
 
-        // Check body collision
         const coordsKey = `${snakeHead.row}:${snakeHead.col}`;
         if (snakeCoordinatesMap.current.has(coordsKey)) {
             return true;
@@ -219,45 +248,65 @@ function App() {
 
             return <div key={col_idx} className={className}></div>;
         },
-        [isPlaying]
+        [isPlaying, gridSize]
     );
 
   
     return (
-      <div className="app-container">
+        <div className="app-container">
           {gameOver ? (
-              <p className="game-over">GAME OVER</p>
+            <p className="game-over">GAME OVER</p>
           ) : (
-              <button onClick={isPlaying ? stopGame : startGame}>
-                  {isPlaying ? "STOP" : "START"} GAME
-              </button>
+            <button onClick={isPlaying ? stopGame : startGame}>
+              {isPlaying ? "STOP" : "START"} GAME
+            </button>
           )}
           <div className="board">
-              {grid.current?.map((row, row_idx) => (
-                  <div key={row_idx} className="row">
-                      {row.map((_, col_idx) => getCell(row_idx, col_idx))}
-                  </div>
-              ))}
+            {grid.current?.map((row, row_idx) => (
+              <div key={row_idx} className="row">
+                {row.map((_, col_idx) => getCell(row_idx, col_idx))}
+              </div>
+            ))}
           </div>
           <p className="score">SCORE {points}</p>
           <div className="keys-container">
-              <button onClick={() => handleDirectionChange("ArrowUp")}>
-                  UP
+            <button onClick={() => handleDirectionChange("ArrowUp")}>
+              UP
+            </button>
+            <div className="key-row">
+              <button onClick={() => handleDirectionChange("ArrowLeft")}>
+                LEFT
               </button>
-              <div className="key-row">
-                  <button onClick={() => handleDirectionChange("ArrowLeft")}>
-                      LEFT
-                  </button>
-                  <button onClick={() => handleDirectionChange("ArrowRight")}>
-                      RIGHT
-                  </button>
-              </div>
-              <button onClick={() => handleDirectionChange("ArrowDown")}>
-                  DOWN
+              <button onClick={() => handleDirectionChange("ArrowRight")}>
+                RIGHT
               </button>
+            </div>
+            <button onClick={() => handleDirectionChange("ArrowDown")}>
+              DOWN
+            </button>
           </div>
-      </div>
-  );
+          <div className="App">
+            <div>
+              <label>
+                Rows:
+                <input
+                  type="number"
+                  value={gridSize.rows}
+                  onChange={(e) => handleGridSizeChange(e.target.value, gridSize.cols)}
+                />
+              </label>
+              <label>
+                Columns:
+                <input
+                  type="number"
+                  value={gridSize.cols}
+                  onChange={(e) => handleGridSizeChange(gridSize.rows, e.target.value)}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      );
 }
 
 export default App;

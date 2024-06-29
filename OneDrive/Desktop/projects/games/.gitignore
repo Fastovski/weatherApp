@@ -21,3 +21,41 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# additional paths to ignore
+../../../../.android/
+../../../../.bash_history
+../../../../.dotnet/
+../../../../.gitconfig
+../../../../.gitignore.txt
+../../../../.jdks/
+../../../../.lesshst
+../../../../.librarymanager/
+../../../../.m2/
+../../../../.vscode/
+../../../../3D Objects/
+../../../../AMDRM_Install.log
+../../../../AMD_RyzenMaster.log
+../../../../AppData/
+../../../../Contacts/
+../../../../Documents/
+../../../../Downloads/
+../../../../Favorites/
+../../../../Links/
+../../../../Music/
+../../../../NTUSER.DAT
+../../WEB/
+../../content_warning_8ea0e6f5.webm
+../../da/
+../../desktop.ini
+../../dff.mwb
+../../diplom/
+../../work/
+
+../../../../Saved Games/
+../../../../Searches/
+../../../../Videos/
+../../../../ntuser.dat.LOG1
+../../../../ntuser.dat.LOG2
+../../../../ntuser.ini
+../../../../source/
