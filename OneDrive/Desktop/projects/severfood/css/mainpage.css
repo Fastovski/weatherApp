@@ -1,0 +1,30 @@
+.main{
+    height: 100vh;
+}
+
+.header{
+    width: 100vw;
+}
+
+.header1lvl{
+    display: flex;
+    padding-top: 2%;
+    padding-left: 7.7%;
+    padding-right: 7.7%;
+    align-items: center;
+    gap: 35%;
+
+}
+
+.basket{
+
+}
+
+.phone{
+
+}
+
+.logo{
+    /* height: 50px;
+    width: 50px; */
+}
