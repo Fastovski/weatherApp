@@ -1,9 +1,21 @@
-.main{
-    height: 100vh;
-}
+@font-face {
+    font-family: 'Cyrillic';
+    src: url('./arcocyrillic.otf') format('opentype');
+  }
+
+  @font-face {
+    font-family: 'NexaBold';
+    src: url('./Nexa-Bold.otf') format('opentype');
+  }
+
+  @font-face {
+    font-family: 'NexaLight';
+    src: url('./Nexa-Light.otf') format('opentype');
+  }
+
+.main{}
 
 .header{
-    width: 100vw;
 }
 
 .header1lvl{
@@ -13,18 +25,152 @@
     padding-right: 7.7%;
     align-items: center;
     gap: 35%;
-
 }
 
 .basket{
 
 }
 
-.phone{
+.phoneNumber{
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 28.08px;
+    color: #01285A;
+    font-family: 'NexaBold';
+}
 
+.aboutPhone{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24.96px;
+    color: #01285A;
+    font-family: 'NexaLight';
 }
 
 .logo{
     /* height: 50px;
     width: 50px; */
 }
+
+.header2lvl {
+    margin-top: 1%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Catalog,
+.Promotion,
+.aboutUs,
+.ShippingAndPayment,
+.Contacts {
+    display: inline-block;
+    margin: 0 15px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 28.08px;
+    color: #01285A;
+    font-family: 'NexaBold';
+}
+
+.menu{
+    width: 100vw;
+    max-width: 100%;
+    overflow-x: hidden;
+    height: 60px;
+    background-color: rgba(126, 200, 239, 0.2);
+    opacity: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navBarMenu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+.Syrniki,
+.Pancakes,
+.MeatDishes,
+.Soups,
+.Sauces{
+    flex: 1;
+
+    display: inline-block;
+    text-align: center;
+    margin: 0 32px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28.08px;
+    color: #01285A;
+    font-family: 'NexaLight';
+}
+
+
+.mainblock {
+    width: 1766px; /* 92% of 1920px */
+    height: 660px;
+    margin-top: 37px;
+  }
+  
+  .caption {
+    z-index: 1;
+    position: absolute;
+    font-size: 92px;
+    font-weight: 700;
+    line-height: 103px;
+    color: rgba(1, 40, 90, 1);
+    font-family: 'Cyrillic';
+    margin-top: 185px;
+    margin-left: 341px;
+  }
+  
+  .caption .top-line,
+  .caption .bottom-line {
+    display: block;
+  }
+  
+  .description {
+    z-index: 1;
+    position: absolute;
+    font-size: 28px;
+    margin-top: 325px;
+    margin-left: 341px;
+  }
+  
+  .butToCatalog {
+    z-index: 1;
+    position: absolute;
+    margin-top: 418px;
+    margin-left: 341px;
+  }
+  
+  .happyFamily {
+    z-index: 0;
+    position: absolute;
+    right: 0;
+    margin-top: -9px;
+    overflow: hidden;
+  }
+  
+  .circles {
+    position: relative;
+    display: flex;
+  }
+  
+  .firCircle {
+    position: absolute;
+    margin-top: 407px;
+    margin-left: 797px;
+    z-index: -1;
+  }
+  
+  .secSircle {
+    position: absolute;
+    margin-top: 129px;
+    margin-left: 571px;
+    z-index: -2;
+  }
