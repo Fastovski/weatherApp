@@ -12,21 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const parser_1 = require("./parser");
-const app = (0, express_1.default)();
-const port = 3000;
-app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const links = yield (0, parser_1.main)();
-        console.log('Extracted links:', links);
-        res.send(`Links: ${links.join(', ')}`);
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).send('Error parsing the page');
-    }
-}));
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+const axios_1 = __importDefault(require("axios"));
+const MongoUrl = "mongodb://127.0.0.1:27017";
+const dbName = 'animeService';
+const collectionName = 'animeLinks';
+function fetchHTML(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { data } = yield axios_1.default.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        });
+        return data;
+    });
+}
