@@ -8,7 +8,7 @@ app.get('/', async (req: Request, res: Response) => {
   try {
     const links = await main();
     console.log('Extracted links:', links);
-    res.send(`Links: ${links.join(', ')}`);
+    // res.send(`Links: ${links.join(', ')}`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error parsing the page');

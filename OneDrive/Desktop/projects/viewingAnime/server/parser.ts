@@ -17,7 +17,7 @@ export async function fetchHTML(url: string): Promise<string> {
     return data;
 }
 
-export async function extractLinks(html: string): Promise<string[]> {
+async function extractAnimeLinks(html: string): Promise<string[]> {
     const $ = cheerio.load(html);
     const links: Set<string> = new Set();
 
@@ -31,64 +31,47 @@ export async function extractLinks(html: string): Promise<string[]> {
     return Array.from(links);
 }
 
-async function saveLinksToMongoDB(links:string[]){
-    let client: MongoClient | null = null;
-    try{
-        client = await MongoClient.connect(MongoUrl);
-        const db: Db = client.db(dbName);
-        const collection: Collection = db.collection(collectionName);
+async function extractEpisodeLinks(html: string): Promise<string[]> {
+    const $ = cheerio.load(html);
+    const links: string[] = [];
 
-        await collection.insertMany(links.map(link => ({ link })));
-        console.log(`Saved ${links.length} to MongoDB`);
-    } catch (error) {
-        console.error('Error saving links to MongoDB:', error);
-    } finally {
-        if (client) {
-            await client.close();
+    $('.short-btn.green.video.the_hildi, .short-btn.black.video.the_hildi').each((index, element) => {
+        const href = $(element).attr('href');
+        if (href) {
+            links.push(`https://jut.su${href}`);
         }
-    }
+    });
+
+    return links;
 }
 
-export async function main(): Promise<string[]> {
-    try {
-        const html = await fetchHTML(URL);
-        const links = await extractLinks(html);
-        await saveLinksToMongoDB(links);
-        return links;
-    } catch (error) {
-        console.error('Error:', error);
-        return [];
+export async function main() {
+    let animeLinks: string[] = [];
+    let episodeLinks: string[] = [];
+    let currentIndex = 0;
+  
+    while (currentIndex < animeLinks.length || animeLinks.length === 0) {
+        let currentAnimeLink: string;
+        if (animeLinks.length === 0) {
+            const html = await fetchHTML(URL);
+            animeLinks = await extractAnimeLinks(html);
+            currentAnimeLink = animeLinks[0];
+        } else {
+            currentAnimeLink = animeLinks[currentIndex];
+        }
+  
+        const html = await fetchHTML(currentAnimeLink);
+        episodeLinks = await extractEpisodeLinks(html);
+  
+        console.log(`Extracted ${episodeLinks.length} episode links for anime: ${currentAnimeLink}`);
+  
+        currentIndex++;
     }
+  
+    console.log('All links extracted successfully!');
+    return animeLinks;
 }
 
-// async function fetchHTML(url: string): Promise<string> {
-//     const { data } = await axios.get(url, {
-//         headers: {
-//             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-//         }
-//     });
-//     return data;
-// }
-
-// async function extractLinks(html: string): Promise<string[]> {
-//     const $ = cheerio.load(html);
-//     const links: string[] = [];
-
-//     $('div.all_anime_global a').each((index, element) => {
-//         const href = $(element).attr('href');
-//         if (href) {
-//             links.push(`https://jut.su${href}`);
-//         }
-//     });
-
-//     try {
-//         await saveLinksToMongoDB(links);
-//     } catch (error) {
-//         console.error('Error saving links to MongoDB:', error);
-//     }
-
-//     return links;
-// }
 
 // async function saveLinksToMongoDB(links:string[]){
 //     let client: MongoClient | null = null;
@@ -112,7 +95,7 @@ export async function main(): Promise<string[]> {
 //     try {
 //         const html = await fetchHTML(URL);
 //         const links = await extractLinks(html);
-//         console.log('Extracted links:', links);
+//         // await saveLinksToMongoDB(links);
 //         return links;
 //     } catch (error) {
 //         console.error('Error:', error);

@@ -12,9 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = exports.extractLinks = exports.fetchHTML = void 0;
+exports.main = exports.fetchHTML = void 0;
 const axios_1 = __importDefault(require("axios"));
-const mongodb_1 = require("mongodb");
 const cheerio_1 = __importDefault(require("cheerio"));
 const URL = 'https://jut.su/anime/action-demons/2024/';
 const MongoUrl = "mongodb://127.0.0.1:27017";
@@ -31,7 +30,7 @@ function fetchHTML(url) {
     });
 }
 exports.fetchHTML = fetchHTML;
-function extractLinks(html) {
+function extractAnimeLinks(html) {
     return __awaiter(this, void 0, void 0, function* () {
         const $ = cheerio_1.default.load(html);
         const links = new Set();
@@ -44,66 +43,44 @@ function extractLinks(html) {
         return Array.from(links);
     });
 }
-exports.extractLinks = extractLinks;
-function saveLinksToMongoDB(links) {
+function extractEpisodeLinks(html) {
     return __awaiter(this, void 0, void 0, function* () {
-        let client = null;
-        try {
-            client = yield mongodb_1.MongoClient.connect(MongoUrl);
-            const db = client.db(dbName);
-            const collection = db.collection(collectionName);
-            yield collection.insertMany(links.map(link => ({ link })));
-            console.log(`Saved ${links.length} to MongoDB`);
-        }
-        catch (error) {
-            console.error('Error saving links to MongoDB:', error);
-        }
-        finally {
-            if (client) {
-                yield client.close();
+        const $ = cheerio_1.default.load(html);
+        const links = [];
+        $('.short-btn.green.video.the_hildi, .short-btn.black.video.the_hildi').each((index, element) => {
+            const href = $(element).attr('href');
+            if (href) {
+                links.push(`https://jut.su${href}`);
             }
-        }
+        });
+        return links;
     });
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const html = yield fetchHTML(URL);
-            const links = yield extractLinks(html);
-            yield saveLinksToMongoDB(links);
-            return links;
+        let animeLinks = [];
+        let episodeLinks = [];
+        let currentIndex = 0;
+        while (currentIndex < animeLinks.length || animeLinks.length === 0) {
+            let currentAnimeLink;
+            if (animeLinks.length === 0) {
+                const html = yield fetchHTML(URL);
+                animeLinks = yield extractAnimeLinks(html);
+                currentAnimeLink = animeLinks[0];
+            }
+            else {
+                currentAnimeLink = animeLinks[currentIndex];
+            }
+            const html = yield fetchHTML(currentAnimeLink);
+            episodeLinks = yield extractEpisodeLinks(html);
+            console.log(`Extracted ${episodeLinks.length} episode links for anime: ${currentAnimeLink}`);
+            currentIndex++;
         }
-        catch (error) {
-            console.error('Error:', error);
-            return [];
-        }
+        console.log('All links extracted successfully!');
+        return animeLinks;
     });
 }
 exports.main = main;
-// async function fetchHTML(url: string): Promise<string> {
-//     const { data } = await axios.get(url, {
-//         headers: {
-//             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-//         }
-//     });
-//     return data;
-// }
-// async function extractLinks(html: string): Promise<string[]> {
-//     const $ = cheerio.load(html);
-//     const links: string[] = [];
-//     $('div.all_anime_global a').each((index, element) => {
-//         const href = $(element).attr('href');
-//         if (href) {
-//             links.push(`https://jut.su${href}`);
-//         }
-//     });
-//     try {
-//         await saveLinksToMongoDB(links);
-//     } catch (error) {
-//         console.error('Error saving links to MongoDB:', error);
-//     }
-//     return links;
-// }
 // async function saveLinksToMongoDB(links:string[]){
 //     let client: MongoClient | null = null;
 //     try{
@@ -124,7 +101,7 @@ exports.main = main;
 //     try {
 //         const html = await fetchHTML(URL);
 //         const links = await extractLinks(html);
-//         console.log('Extracted links:', links);
+//         // await saveLinksToMongoDB(links);
 //         return links;
 //     } catch (error) {
 //         console.error('Error:', error);

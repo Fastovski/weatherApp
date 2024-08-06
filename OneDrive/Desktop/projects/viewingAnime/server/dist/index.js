@@ -20,7 +20,7 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const links = yield (0, parser_1.main)();
         console.log('Extracted links:', links);
-        res.send(`Links: ${links.join(', ')}`);
+        // res.send(`Links: ${links.join(', ')}`);
     }
     catch (error) {
         console.error(error);
